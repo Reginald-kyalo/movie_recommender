@@ -3,8 +3,7 @@
 """
 import pandas as pd
 from models.base_model import BaseModel, Base
-from sqlalchemy import create_engine, Column, Integer, String, Float, Text, Date, Numeric, ForeignKey, ARRAY
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Float, Text, Date, Numeric
 
 class Movie(BaseModel, Base):
     __tablename__ = 'movies'

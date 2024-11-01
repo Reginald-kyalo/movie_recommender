@@ -35,10 +35,11 @@ class BaseModel():
         """
         rdict = self.__dict__.copy()
         rdict["__class__"] = str(type(self).__name__)
+        rdict.pop("_sa_instance_state", None)
         return rdict
 
     def __str__(self):
         """Return the print/str representation of the BaseModel instance.
         """
         d = self.__dict__.copy()
-        return "[{}] ({}) {}".format(type(self).__name__, self.id, d)
+        return "[{}] {}".format(type(self).__name__, d)

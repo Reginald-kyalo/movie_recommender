@@ -6,8 +6,7 @@ from sqlalchemy.orm import relationship
 class Credit(BaseModel, Base):
     __tablename__ = 'credits'
 
-    id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('movies.movie_id', ondelete='CASCADE'))
+    movie_id = Column(Integer, ForeignKey('movies.movie_id', ondelete='CASCADE'), primary_key=True)
     title = Column(Text)
     cast = Column(Text)
     crew = Column(Text)

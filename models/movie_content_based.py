@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 from models.base_model import BaseModel, Base
-from sqlalchemy import create_engine, Column, Integer, String, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Text
 
 class MovieContentBased(BaseModel, Base):
     __tablename__ = 'movies_content_based'
@@ -11,4 +10,4 @@ class MovieContentBased(BaseModel, Base):
     genres = Column(Text)
     keywords = Column(Text)
     cast = Column(Text)
-    crew = Column(Text)
+    director = Column(Text)
