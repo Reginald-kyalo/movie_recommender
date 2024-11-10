@@ -5,7 +5,8 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 class BaseModel():
-    """Represents the BaseModel of the Movie recommender project."""
+    """Represents the BaseModel of the Movie recommender project.
+    """
 
     def __init__(self, *args, **kwargs):
         """Initialize a new BaseModel.
@@ -42,4 +43,4 @@ class BaseModel():
         """Return the print/str representation of the BaseModel instance.
         """
         d = self.__dict__.copy()
-        return "[{}] {}".format(type(self).__name__, d)
+        return "[{}] {}".format(self.title, d)

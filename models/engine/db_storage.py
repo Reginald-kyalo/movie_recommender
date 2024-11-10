@@ -1,86 +1,114 @@
 #!/usr/bin/python3
+"""Database storage engine for the movie recommendation system.
+
+This module provides the DBStorage class, which manages the database connection,
+session, and data manipulation for SQLAlchemy models in the movie recommendation system.
+"""
+
 from models.base_model import Base
-from models.credits import Credit
+from models.credit import Credit
 from models.movie import Movie
+from models.movie_content_based import MovieContentBased
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from os import getenv
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 
-##postgresql://moviedb_owner:MQnG7pADat3y@ep-restless-mouse-a8zehkhu.eastus2.azure.neon.tech/moviedb?sslmode=require
 class DBStorage:
-    """Sets up attributes and methods for storage
-    for mapping hbnb instances to database
-    Returns:
-        engine (sqlalchemy.Engine): working SQLAlchmey Engine
-        session (sqlalchemy.Session): working SQLAlchemy Session
+    """Database storage engine for handling data persistence with SQLAlchemy models.
+
+    Attributes:
+        __engine (sqlalchemy.Engine): The SQLAlchemy engine instance.
+        __session (sqlalchemy.Session): The current SQLAlchemy session instance.
     """
 
     __engine = None
     __session = None
 
     def __init__(self) -> None:
-        """Initializes an instance of DBStorage"""
+        """Initializes an instance of DBStorage.
+
+        Loads environment variables and sets up a SQLAlchemy engine to
+        connect to the PostgreSQL database. Uses SSL mode for secure connection.
+        """
         load_dotenv()
         tmpPostgres = urlparse(getenv("DATABASE_URL"))
-        self.__engine = create_engine(f"postgresql://{tmpPostgres.username}:{tmpPostgres.password}@{tmpPostgres.hostname}{tmpPostgres.path}?sslmode=require", echo=True)
-        ##if getenv("REC_ENV") == "test":
-        ##    Base.metadata.drop_all(self.__engine)
+        self.__engine = create_engine(
+            f"postgresql://{tmpPostgres.username}:{tmpPostgres.password}@{tmpPostgres.hostname}{tmpPostgres.path}?sslmode=require",
+            echo=True
+        )
 
     def all(self, cls):
-        """Query on the curret database session all objects of the given class.
+        """Query all objects of a given class from the current database session.
 
         If cls is None, queries all types of objects.
 
-        Return:
-            Dict of queried classes in the format <class name>.<obj id> = obj.
+        Args:
+            cls (type or str): The class of objects to query. If None, all classes are queried.
+
+        Returns:
+            dict: A dictionary with queried classes in the format <class name>.<obj id> = obj.
         """
         if cls is None:
             objs = self.__session.query(Movie).all()
             objs.extend(self.__session.query(Credit).all())
-            ##objs.extend(self.__session.query(User).all())
-            ##objs.extend(self.__session.query(Place).all())
-            ##objs.extend(self.__session.query(Review).all())
-            ##objs.extend(self.__session.query(Amenity).all())
+            objs.extend(self.__session.query(MovieContentBased).all())
         else:
             if type(cls) == str:
                 try:
                     cls = eval(cls)
                 except NameError:
                     return {}
-                objs = self.__session.query(cls)
-            return {o for o in objs}
+            objs = self.__session.query(cls).all()
+        return {f"{type(obj).__name__}.{obj.id}": obj for obj in objs}
 
     def get_item_by_id(self, cls, id):
-        if id == None:
-            return
+        """Retrieve an item by class and ID from the database.
+
+        Args:
+            cls (type or str): The class of the item to retrieve.
+            id (int): The ID of the item to retrieve.
+
+        Returns:
+            obj: The item instance if found, otherwise None.
+        """
+        if id is None:
+            return None
         if type(cls) == str:
             cls = eval(cls)
         return self.__session.query(cls).filter(cls.movie_id == id).first()
 
     def new(self, obj):
-        """adds objects to current database session"""
+        """Add an object to the current database session.
+
+        Args:
+            obj (Base): The object instance to add to the session.
+        """
         self.__session.add(obj)
 
     def delete(self, obj=None):
-        """delete from the current
-        database session obj if not None
+        """Delete an object from the current database session.
+
+        Args:
+            obj (Base, optional): The object instance to delete from the session.
         """
         if obj is not None:
             self.__session.delete(obj)
 
     def reload(self):
-        """create all tables in the database"""
+        """Create all tables in the database and start a new session.
+
+        Initializes the SQLAlchemy session by binding it to the engine.
+        """
         Base.metadata.create_all(self.__engine)
-        Session = scoped_session(sessionmaker(bind=self.__engine,
-                                              expire_on_commit=False))
+        Session = scoped_session(sessionmaker(bind=self.__engine, expire_on_commit=False))
         self.__session = Session()
 
     def save(self):
-        """commit all changes of the current database session"""
+        """Commit all changes in the current database session."""
         self.__session.commit()
 
     def close(self):
-        """closes current database session """
+        """Close the current database session."""
         self.__session.close()
