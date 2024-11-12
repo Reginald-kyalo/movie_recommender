@@ -40,15 +40,13 @@ class DBStorage:
         )
 
     def all(self, cls):
-        """Query all objects of a given class from the current database session.
-
-        If cls is None, queries all types of objects.
+        """Query all objects of a given class from the current database session..
 
         Args:
             cls (type or str): The class of objects to query. If None, all classes are queried.
 
         Returns:
-            dict: A dictionary with queried classes in the format <class name>.<obj id> = obj.
+            dict: A dictionary with queried classes in the format <class name> = obj.
         """
         if cls is None:
             objs = self.__session.query(Movie).all()
@@ -61,7 +59,7 @@ class DBStorage:
                 except NameError:
                     return {}
             objs = self.__session.query(cls).all()
-        return {f"{type(obj).__name__}.{obj.id}": obj for obj in objs}
+        return {obj for obj in objs}
 
     def get_item_by_id(self, cls, id):
         """Retrieve an item by class and ID from the database.

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Data preprocessing module for movie recommendation system.
+"""Data preprocesser module for movie recommendation system.
 
 This module contains functions for parsing, loading, and preprocessing movie data
 from CSV files, including saving the data to a database for content-based filtering.
@@ -58,6 +58,7 @@ def load_csv(csv_path):
             return
     else:
         print('Enter valid file path')
+        return
 
     csv_path = str(csv_path)
     path = csv_path.split('_')
@@ -227,13 +228,13 @@ def process_data(movie_to_be_searched=None):
         credits_set = storage.all('Credit')
         if not movies_set:
             try:
-                load_csv("/home/reginald/reg_codes/webstack_portfolio_project/data/movies.csv")
+                load_csv("/home/reginald/reg_codes/webstack_portfolio_project/movie_recommender/tmdb_5000_movies.csv")
                 movies_set = storage.all('Movie')
             except Exception as e:
                 print(f"Error loading movies data: {e}")
         if not credits_set:
             try:
-                load_csv("/home/reginald/reg_codes/webstack_portfolio_project/data/credits.csv")
+                load_csv("/home/reginald/reg_codes/webstack_portfolio_project/movie_recommender/tmdb_5000_credits.csv")
                 credits_set = storage.all('Credit')
             except Exception as e:
                 print(f"Error loading credits data: {e}")
@@ -250,7 +251,7 @@ def process_data(movie_to_be_searched=None):
         movies['cast'] = movies['cast'].apply(convert3)
         movies['crew'] = movies['crew'].apply(fetch_director)
         save_processed_data(movies)
-    if not movies[movies['title'].str.lower() == movie_to_be_searched.lower()].empty:
+    if movies[movies['title'].str.strip().str.lower().str.contains(movie_to_be_searched.strip().lower())].empty:
         raise IndexError("Movie not found in the database.")
 
     return movies

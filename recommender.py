@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Generate movie recommendations based on content based filtering
 """
-from preprocessing import process_data
+from preprocesser import process_data
 from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -87,7 +87,7 @@ def recommend(movie):
     try:
         movie_index = new_df[new_df['title'].str.lower() == movie.lower()].index[0]
     except IndexError:
-        return ["Movie not found in the dataframe."]
+        return ["Movie not found in the database."]
 
     distances = similarity[movie_index]
     movies_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])[1:6]

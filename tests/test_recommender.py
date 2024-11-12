@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from .. import stem, recommend
+from ..recommender import stem, recommend
 import pandas as pd
 
 class TestMovieRecommender(unittest.TestCase):

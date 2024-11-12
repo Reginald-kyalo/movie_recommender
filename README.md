@@ -23,12 +23,17 @@ This app is designed to provide personalized movie recommendations based on user
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/Reginald-kyalo/movie_recommender.git
-   cd movierecommender
+   cd movie_recommender
    ```
 
 2. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
+   ```
+   
+3. **Setting DATABASE_URL for Database Access**
+   ```bash
+   export DATABASE_URL="postgresql://moviedb_owner:MQnG7pADat3y@ep-restless-mouse-a8zehkhu.eastus2.azure.neon.tech/moviedb?sslmode=require"
    ```
 
 ## Usage

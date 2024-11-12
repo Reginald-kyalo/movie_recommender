@@ -1,8 +1,9 @@
+#!/usr/bin/python3
 from recommender import recommend
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
-@app.route('/recommend', methods=['GET'])
+@app.route('/movielike', methods=['GET'])
 def recommendation():
     """
     Endpoint to provide movie recommendations based on a given title.
@@ -32,6 +33,9 @@ def recommendation():
     title = title.lower()
 
     recommendations = recommend(title)
+    
+    if not recommendations:
+        return jsonify({"error": "No recommendations found for the provided title."}), 400
 
     if not isinstance(recommendations, (dict, list)):
         return jsonify({"error": "An unexpected error occurred"}), 500
@@ -39,6 +43,6 @@ def recommendation():
     if isinstance(recommendations, list) and isinstance(recommendations[0], str):
         return jsonify({"error": recommendations[0]}), 400
 
-    return recommendations
+    return jsonify(recommendations)
 if __name__ == '__main__':
     app.run(debug=True)

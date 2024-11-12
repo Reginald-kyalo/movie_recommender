@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import patch, MagicMock, mock_open
 import pandas as pd
-from preprocessing import (
+from preprocesser import (
     parse_json_field,
     load_csv,
     save_processed_data,
@@ -14,7 +14,7 @@ from preprocessing import (
     process_data
 )
 
-class TestPreprocessing(unittest.TestCase):
+class TestPreprocesser(unittest.TestCase):
     """ """
     def test_parse_json_field_valid_json(self):
         """ """
@@ -105,10 +105,10 @@ class TestPreprocessing(unittest.TestCase):
         result = fetch_director(input_str)
         self.assertEqual(result, expected_output, "Should return the first director found")
 
-    @patch('preprocessing.pd.read_csv')
-    @patch('preprocessing.storage')
-    @patch('preprocessing.Movie')
-    @patch('preprocessing.Credit')
+    @patch('preprocesser.pd.read_csv')
+    @patch('preprocesser.storage')
+    @patch('preprocesser.Movie')
+    @patch('preprocesser.Credit')
     def test_load_csv_movies_csv(self, mock_credit, mock_movie, mock_storage, mock_read_csv):
         csv_path = "data_movies.csv"
         mock_read_csv.return_value = pd.DataFrame({
@@ -165,10 +165,10 @@ class TestPreprocessing(unittest.TestCase):
         )
         self.assertEqual(mock_credit.call_count, 0, "Should not process credits when loading movies.csv")
 
-    @patch('preprocessing.pd.read_csv')
-    @patch('preprocessing.storage')
-    @patch('preprocessing.Movie')
-    @patch('preprocessing.Credit')
+    @patch('preprocesser.pd.read_csv')
+    @patch('preprocesser.storage')
+    @patch('preprocesser.Movie')
+    @patch('preprocesser.Credit')
     def test_load_csv_credits_csv(self, mock_credit, mock_movie, mock_storage, mock_read_csv):
         """ """
         csv_path = "data_credits.csv"
@@ -192,7 +192,7 @@ class TestPreprocessing(unittest.TestCase):
         )
         mock_movie.assert_not_called()
 
-    @patch('preprocessing.pd.read_csv')
+    @patch('preprocesser.pd.read_csv')
     def test_load_csv_invalid_file_type(self, mock_read_csv):
         """ """
         csv_path = "data_unknown.csv"
@@ -201,7 +201,7 @@ class TestPreprocessing(unittest.TestCase):
             mock_read_csv.assert_called_with(csv_path)
             mock_print.assert_any_call("Unsupported file type. Please provide either 'movies.csv' or 'credits.csv'.")
 
-    @patch('preprocessing.pd.read_csv')
+    @patch('preprocesser.pd.read_csv')
     def test_load_csv_no_csv_path(self, mock_read_csv):
         """ """
         with patch('builtins.print') as mock_print:
@@ -209,8 +209,8 @@ class TestPreprocessing(unittest.TestCase):
             mock_read_csv.assert_not_called()
             mock_print.assert_any_call("Enter valid file path")
 
-    @patch('preprocessing.storage')
-    @patch('preprocessing.MovieContentBased')
+    @patch('preprocesser.storage')
+    @patch('preprocesser.MovieContentBased')
     def test_save_processed_data(self, mock_movie_content_based, mock_storage):
         """ """
         movies_df = pd.DataFrame({
@@ -239,7 +239,7 @@ class TestPreprocessing(unittest.TestCase):
         instance = mock_movie_content_based.return_value
         instance.save.assert_called_once()
 
-    @patch('preprocessing.storage')
+    @patch('preprocesser.storage')
     def test_load_processed_data(self, mock_storage):
         """ """
         mock_movie = MagicMock()
@@ -265,10 +265,10 @@ class TestPreprocessing(unittest.TestCase):
         }])
         pd.testing.assert_frame_equal(result, expected_df, check_dtype=False)
 
-    @patch('preprocessing.save_processed_data')
-    @patch('preprocessing.load_csv')
-    @patch('preprocessing.load_processed_data')
-    @patch('preprocessing.storage')
+    @patch('preprocesser.save_processed_data')
+    @patch('preprocesser.load_csv')
+    @patch('preprocesser.load_processed_data')
+    @patch('preprocesser.storage')
     def test_process_data_existing_data(self, mock_storage, mock_load_processed_data, mock_load_csv, mock_save_processed_data):
         """ """
         mock_load_processed_data.return_value = pd.DataFrame({
@@ -287,10 +287,10 @@ class TestPreprocessing(unittest.TestCase):
         self.assertIsInstance(result, pd.DataFrame, "Result should be a DataFrame")
         self.assertEqual(len(result), 1, "DataFrame should contain one movie")
 
-    @patch('preprocessing.save_processed_data')
-    @patch('preprocessing.load_csv')
-    @patch('preprocessing.load_processed_data')
-    @patch('preprocessing.storage')
+    @patch('preprocesser.save_processed_data')
+    @patch('preprocesser.load_csv')
+    @patch('preprocesser.load_processed_data')
+    @patch('preprocesser.storage')
     def test_process_data_empty_database(self, mock_storage, mock_load_processed_data, mock_load_csv, mock_save_processed_data):
         """ """
         mock_load_processed_data.return_value = pd.DataFrame()
@@ -308,10 +308,10 @@ class TestPreprocessing(unittest.TestCase):
          
         mock_print.assert_any_call("Merged columns:", pd.Index(['movie_id', 'title', 'overview', 'genres', 'cast', 'keywords', 'crew'], dtype='object'))
 
-    @patch('preprocessing.save_processed_data')
-    @patch('preprocessing.load_csv')
-    @patch('preprocessing.load_processed_data')
-    @patch('preprocessing.storage')
+    @patch('preprocesser.save_processed_data')
+    @patch('preprocesser.load_csv')
+    @patch('preprocesser.load_processed_data')
+    @patch('preprocesser.storage')
     def test_process_data_movie_not_found(self, mock_storage, mock_load_processed_data, mock_load_csv, mock_save_processed_data):
         """ """
         mock_load_processed_data.return_value = pd.DataFrame({
@@ -328,10 +328,10 @@ class TestPreprocessing(unittest.TestCase):
             process_data(movie_to_be_searched="Nonexistent Movie")
         self.assertEqual(str(context.exception), "Movie not found in the database.")
 
-    @patch('preprocessing.save_processed_data')
-    @patch('preprocessing.load_csv')
-    @patch('preprocessing.load_processed_data')
-    @patch('preprocessing.storage')
+    @patch('preprocesser.save_processed_data')
+    @patch('preprocesser.load_csv')
+    @patch('preprocesser.load_processed_data')
+    @patch('preprocesser.storage')
     def test_process_data_loading_error(self, mock_storage, mock_load_processed_data, mock_load_csv, mock_save_processed_data):
         """ """
         mock_load_processed_data.return_value = pd.DataFrame()
@@ -345,7 +345,7 @@ class TestPreprocessing(unittest.TestCase):
 
         mock_print.assert_any_call("Error loading movies data: Failed to load movies")
 
-    @patch('preprocessing.pd.read_csv', side_effect=Exception("CSV read error"))
+    @patch('preprocesser.pd.read_csv', side_effect=Exception("CSV read error"))
     def test_load_csv_exception_handling(self, mock_read_csv):
         """ """
         csv_path = "data_movies.csv"
@@ -361,10 +361,10 @@ class TestPreprocessing(unittest.TestCase):
         result = fetch_director(input_str)
         self.assertEqual(result, expected_output, "Should return empty list when no director is present")
 
-    @patch('preprocessing.pd.read_csv')
-    @patch('preprocessing.storage')
-    @patch('preprocessing.Movie')
-    @patch('preprocessing.Credit')
+    @patch('preprocesser.pd.read_csv')
+    @patch('preprocesser.storage')
+    @patch('preprocesser.Movie')
+    @patch('preprocesser.Credit')
     def test_load_csv_print_head(self, mock_credit, mock_movie, mock_storage, mock_read_csv):
         """ """
         csv_path = "data_movies.csv"
