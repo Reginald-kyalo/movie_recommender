@@ -41,6 +41,7 @@ This app is designed to provide personalized movie recommendations based on user
 1. **Run the main application**:
    ```bash
    flask run app
+   curl -X GET "http://127.0.0.1:5000/movielike?title=<movie-title>" Movie title eg.. Inception
    ```
 
 2. **Customization**: Modify configurations or settings in `app.py` to adjust recommendation criteria or url parameters.
